@@ -7,7 +7,8 @@ from world_cup_predictor import (
     simulate_match,
     simulate_full_tournament,
     most_likely_tournament_run,
-    all_groups
+    all_groups,
+    simulate_many_tournaments
 )
 
 teams = sorted({team for group in all_groups.values() for team in group})
@@ -107,8 +108,7 @@ def show_most_likely_tournament():
 
     text = "MOST LIKELY TOURNAMENT RUN FROM 1000 SIMULATIONS\n\n"
 
-    champion, champion_count = result["champion"]
-    text += f"Most common champion: {champion} ({champion_count}/1000)\n\n"
+    m
 
     final_match, final_count = result["final"]
     text += (
@@ -125,6 +125,18 @@ def show_most_likely_tournament():
         text += f"{match[0]} vs {match[1]} | Winner: {match[2]} ({count}/1000)\n"
 
     write_output(text)
+
+def ten_most_likely_winners():
+    result = simulate_many_tournaments(1000)
+    top_10 = result.head(10)
+    text = "10 most likely winners\n\n"
+    for _, row in top_10.iterrows():
+        team = row["team"]
+        chance = row["champion_prob"]
+        text += f"{team}: {chance:.2%}\n"
+    write_output(text)
+
+
 
 ws = tk.Tk()
 ws.title("World Cup Simulator")
@@ -151,6 +163,9 @@ tournament_button.pack(pady=10)
 
 most_likely_button = tk.Button(ws, text="Most Likely Tournament", command=show_most_likely_tournament)
 most_likely_button.pack(pady=10)
+
+tournament_odds_button = tk.Button(ws, text="Tournament Odds", command=ten_most_likely_winners)
+tournament_odds_button.pack(pady=10)
 
 output_box = scrolledtext.ScrolledText(ws, width=90, height=28, font=("Courier New", 10))
 output_box.pack(pady=20)
